@@ -1,1 +1,28 @@
-theme: jekyll-theme-minimal
+# Dependencies
+plugins:             [jekyll-paginate]
+markdown:         redcarpet
+highlighter:      pygments
+
+# Permalinks
+permalink:        pretty
+#relative_permalinks: true
+
+# Setup
+title:            'Table Soccer'
+tagline:          ''
+description:      '... is for Robots'
+url:              http://ts.haxed.dk
+baseurl:          /
+
+author:
+  name:           'Andreas Schmidt Jensen'
+  email:          andreas.s.jensen@gmail.com
+  url:            https://haxed.dk
+
+paginate:         5
+
+# Custom vars
+version:          0.1
+
+github:
+  repo:           https://github.com/andreasschmidtjensen/tablesoccer
