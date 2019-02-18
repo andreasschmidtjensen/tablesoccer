@@ -6,7 +6,7 @@ title: Posts
 {% for post in site.posts %}
   <div class="post">
     <h3 class="post-title">
-      <a href="{{ post.url }}">
+      <a href="{{ site.baseurl }}{{ post.url }}">
         <span class="post-date" style="display: inline;">{{ post.date | date_to_string }}</span>
         {{ post.title }}
       </a>

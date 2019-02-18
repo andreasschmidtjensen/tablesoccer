@@ -11,8 +11,8 @@ permalink:        pretty
 title:            'Table Soccer'
 tagline:          ''
 description:      '... is for Robots'
-url:              http://www.haxed.dk
-baseurl:          /tablesoccer/
+#url:              http://www.haxed.dk
+baseurl:          /tablesoccer
 
 author:
   name:           'Andreas Schmidt Jensen'
