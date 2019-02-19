@@ -16,3 +16,5 @@ I will be documenting the work I am doing, which will include things like
 While I have plenty of experience in software development, hardware is new to me, so I am looking forward to learning something entirely new!
 
 I hope you enjoy reading!
+
+PS: This site is built using Jekyll on Github Pages and I'm using a theme called [Hyde](https://github.com/poole/hyde).
