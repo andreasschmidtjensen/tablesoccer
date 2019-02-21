@@ -1,0 +1,7 @@
+corner
+ball
+home_player
+home_keeper
+away_player
+away_keeper
+field_center
