@@ -104,4 +104,9 @@ venv.bak/
 .mypy_cache/
 
 docs/_site/
-yolo/images/.DS_Store
+.DS_Store
+
+yolo/weights/
+
+# labels needed for autolabeling new training examples (folder copied from darknet folder)
+yolo/data/labels
