@@ -9,12 +9,12 @@ IN_DIR = "../images/"
 OUT_DIR = "../reduced_labels/"
 
 MAPPING = {
-    "1": "0",
-    "2": "1",
+    "1": "0", #ball
+    "2": "1", #player
     "3": "1",
     "4": "1",
     "5": "1",
-    "6": "2"
+    "6": "2"  #center
 
 }
 for file in os.listdir(IN_DIR):
