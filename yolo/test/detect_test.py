@@ -7,6 +7,8 @@ import os
 DARKNET_DIR = os.environ['DARKNET_DIR']
 print("DD: %s" % DARKNET_DIR)
 
+os.chdir(DARKNET_DIR)
+
 image_name = DARKNET_DIR + "/dog.jpg"
 config = DARKNET_DIR + "/yolov3.cfg"
 weights = DARKNET_DIR + "/yolov3.weights"

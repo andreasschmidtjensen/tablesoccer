@@ -74,19 +74,22 @@ class METADATA(Structure):
     _fields_ = [("classes", c_int),
                 ("names", POINTER(c_char_p))]
 
-
-
 #lib = CDLL("/home/pjreddie/documents/darknet/libdarknet.so", RTLD_GLOBAL)
 #lib = CDLL("darknet.so", RTLD_GLOBAL)
 hasGPU = True
 if os.name == "nt":
     # If DARKNET_DIR is set in Environment, use that, otherwise assume it is run directly in DARKNET directory
+    old_cwd = os.getcwd()
+
     DARKNET_DIR = None
     if 'DARKNET_DIR' in os.environ:
         DARKNET_DIR = os.environ['DARKNET_DIR']
         os.chdir(DARKNET_DIR)
 
     cwd = DARKNET_DIR if DARKNET_DIR is not None else os.path.dirname(__file__)
+
+    os.chdir(old_cwd)
+
     os.environ['PATH'] = cwd + ';' + os.environ['PATH']
     winGPUdll = os.path.join(cwd, "yolo_cpp_dll.dll")
     winNoGPUdll = os.path.join(cwd, "yolo_cpp_dll_nogpu.dll")
@@ -285,7 +288,7 @@ netMain = None
 metaMain = None
 altNames = None
 
-def performDetect(image, thresh= 0.25, configPath = "./cfg/yolov3.cfg", weightPath = "yolov3.weights", metaPath= "./data/coco.data", showImage= True, makeImageOnly = False, initOnly= False):
+def performDetect(image, thresh= 0.25, configPath = "./cfg/yolov3.cfg", weightPath = "yolov3.weights", metaPath= "./data/coco.data", showImage= True, makeImageOnly = False, initOnly= False, debug=False):
     """
     Convenience function to handle the detection and returns of objects.
 
@@ -371,7 +374,7 @@ def performDetect(image, thresh= 0.25, configPath = "./cfg/yolov3.cfg", weightPa
         return None
 
     # Do the detection
-    detections = detect(netMain, metaMain, image, thresh)
+    detections = detect(netMain, metaMain, image, thresh, debug=debug)
     if showImage:
         try:
             from skimage import io, draw
