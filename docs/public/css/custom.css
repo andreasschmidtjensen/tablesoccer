@@ -1,0 +1,8 @@
+.post img, .post video {
+	margin: 0 auto 1rem;
+	display: block;
+}
+
+.post p {
+	text-align: justify;
+}
