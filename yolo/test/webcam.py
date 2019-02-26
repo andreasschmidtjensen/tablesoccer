@@ -11,6 +11,7 @@ cwd = os.getcwd()
 config = cwd + "/yolov3-tablesoccer.cfg"
 weights = cwd + "/weights/yolov3-tablesoccer_last.weights"
 data = cwd + "/tablesoccer.data"
+thresh = 0.25
 
 print(data)
 
@@ -21,13 +22,13 @@ while True:
     frame = vs.read()
     frame = imutils.resize(frame, width=400)
 
-    result = performDetect(frame, makeImageOnly=True, configPath=config, weightPath=weights, metaPath=data)
+    result = performDetect(frame, thresh=thresh, makeImageOnly=True, configPath=config, weightPath=weights, metaPath=data)
 
     cv2.imshow('YOLO', cv2.cvtColor(result["image"], cv2.COLOR_BGR2RGB))
     cv2.waitKey(1)
     
 fps.stop()
-print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
+print("[INFO] elapsed time: {:.2f}".format(fps.elapsed()))
 print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
 
 cv2.destroyAllWindows()
