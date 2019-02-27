@@ -110,3 +110,6 @@ yolo/weights/
 
 # labels needed for autolabeling new training examples (folder copied from darknet folder)
 yolo/data/labels
+
+yolo/bad.list
+yolo/eval.txt
