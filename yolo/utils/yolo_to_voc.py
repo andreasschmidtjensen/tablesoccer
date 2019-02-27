@@ -32,16 +32,12 @@ from PIL import Image
 ANNOTATIONS_DIR_PREFIX = "/Users/asj/workspace/private/OpenLabeling/main/output/YOLO_darknet/Movie on 16-02-2019 at 14.46_mov"
 IMAGES_DIR_PREFIX = "/Users/asj/workspace/private/OpenLabeling/main/input/Movie on 16-02-2019 at 14.46_mov"
 
-DESTINATION_DIR = "converted_labels"
+DESTINATION_DIR = "/Users/asj/workspace/private/OpenLabeling/main/output/PASCAL_VOC/Movie on 16-02-2019 at 14.46_mov"
 
 CLASS_MAPPING = {
-    '0': 'corner',
-    '1': 'ball',
-    '2': 'home_player',
-    '3': 'home_keeper',
-    '4': 'away_player',
-    '5': 'away_keeper',
-    '6': 'field_center'
+    '0': 'ball',
+    '1': 'player',
+    '2': 'field_center'
 }
 
 def create_root(file_prefix, width, height):
