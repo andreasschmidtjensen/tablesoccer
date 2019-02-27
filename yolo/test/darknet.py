@@ -204,6 +204,12 @@ predict_image = lib.network_predict_image
 predict_image.argtypes = [c_void_p, IMAGE]
 predict_image.restype = POINTER(c_float)
 
+def network_width(net):
+    return lib.network_width(net)
+
+def network_height(net):
+    return lib.network_height(net)
+    
 def array_to_image(arr):
     import numpy as np
     # need to return old values to avoid python freeing memory
