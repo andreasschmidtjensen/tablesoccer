@@ -130,7 +130,13 @@ if os.name == "nt":
             lib = CDLL(winGPUdll, RTLD_GLOBAL)
             print("Environment variables indicated a CPU run, but we didn't find `"+winNoGPUdll+"`. Trying a GPU run anyway.")
 else:
-    lib = CDLL("./darknet.so", RTLD_GLOBAL)
+    # If DARKNET_DIR is set in Environment, use that, otherwise assume it is run directly in DARKNET directory
+    DARKNET_DIR = "."
+    if 'DARKNET_DIR' in os.environ:
+        DARKNET_DIR = os.environ['DARKNET_DIR']
+
+    lib = CDLL(DARKNET_DIR + "/darknet.so", RTLD_GLOBAL)
+
 lib.network_width.argtypes = [c_void_p]
 lib.network_width.restype = c_int
 lib.network_height.argtypes = [c_void_p]
