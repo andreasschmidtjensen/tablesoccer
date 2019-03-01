@@ -113,3 +113,5 @@ yolo/data/labels
 
 yolo/bad.list
 yolo/eval.txt
+
+.idea/
