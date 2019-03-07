@@ -394,7 +394,7 @@ def performDetect(image, thresh= 0.25, configPath = "./cfg/yolov3.cfg", weightPa
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             image = cv2.resize(image,(lib.network_width(netMain), lib.network_height(netMain)), interpolation = cv2.INTER_LINEAR)
             
-            print("*** "+str(len(detections))+" Results, color coded by confidence ***")
+            if debug: print("*** "+str(len(detections))+" Results, color coded by confidence ***")
             imcaption = []
             for detection in detections:
                 label = detection[0]

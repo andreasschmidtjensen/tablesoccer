@@ -1,1 +1,2 @@
-from tablesoccer.SoccerField import SoccerField
+from tablesoccer.Detector import Detector
+from tablesoccer.Controller import Controller

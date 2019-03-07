@@ -87,7 +87,7 @@ def calculate_corners(center, player_row, board_shape, image_shape, canvas=None,
     vertical_bottom = np.array([player_row[0][0], image_height])
 
     if canvas is not None:
-        cv2.line(image, pt1=tuple(vertical_top.astype(int)), pt2=tuple(vertical_bottom.astype(int)), color=(255, 255, 120), thickness=1)
+        cv2.line(canvas, pt1=tuple(vertical_top.astype(int)), pt2=tuple(vertical_bottom.astype(int)), color=(255, 255, 120), thickness=1)
 
     # angle between true rotation and vertical
     angle = angle_between(vertical_top - vertical_bottom, player_top - player_bottom)
@@ -95,9 +95,9 @@ def calculate_corners(center, player_row, board_shape, image_shape, canvas=None,
     if debug:
         print("Radians=%s\nDegrees=%s" % (angle, angle * 180 / math.pi))
     if canvas is not None:
-        cv2.line(image,
-                 pt1=(center[0], center[1]),
-                 pt2=(center[0], int(center[1] - (board_height / 2))),
+        cv2.line(canvas,
+                 pt1=tuple(center.astype(int)),
+                 pt2=(int(center[0]), int(center[1] - (board_height / 2))),
                  color=(120, 255, 255), thickness=1)
 
     # vector from center, extended vertically to the top
@@ -113,8 +113,8 @@ def calculate_corners(center, player_row, board_shape, image_shape, canvas=None,
     corrected_line_center = center - rotated_vec
 
     if canvas is not None:
-        cv2.circle(image, tuple(corrected_line_center.astype(int)), 2, (255, 180, 255), 2)
-        cv2.line(image, pt1=tuple(center.astype(int)), pt2=tuple(corrected_line_center.astype(int)),
+        cv2.circle(canvas, tuple(corrected_line_center.astype(int)), 2, (255, 180, 255), 2)
+        cv2.line(canvas, pt1=tuple(center.astype(int)), pt2=tuple(corrected_line_center.astype(int)),
                  color=(180, 255, 255), thickness=2)
 
     # calculate all the corners by continuously rotating 90 degrees and adjusting the vector length
@@ -124,14 +124,14 @@ def calculate_corners(center, player_row, board_shape, image_shape, canvas=None,
     tr_rot = br_rot + rotate90_and_extend(bl_rot - br_rot, board_height)
 
     if canvas is not None:
-        cv2.circle(image, tuple(tl_rot.astype(int)), 2, (255, 180, 255), 2)
-        cv2.line(image, pt1=tuple(corrected_line_center.astype(int)), pt2=tuple(tl_rot.astype(int)), color=(180, 255, 255), thickness=2)
-        cv2.circle(image, tuple(bl_rot.astype(int)), 2, (255, 180, 255), 2)
-        cv2.line(image, pt1=tuple(tl_rot.astype(int)), pt2=tuple(bl_rot.astype(int)), color=(180, 255, 255), thickness=2)
-        cv2.circle(image, tuple(br_rot.astype(int)), 2, (255, 180, 255), 2)
-        cv2.line(image, pt1=tuple(bl_rot.astype(int)), pt2=tuple(br_rot.astype(int)), color=(180, 255, 255), thickness=2)
-        cv2.circle(image, tuple(tr_rot.astype(int)), 2, (255, 180, 255), 2)
-        cv2.line(image, pt1=tuple(br_rot.astype(int)), pt2=tuple(tr_rot.astype(int)), color=(180, 255, 255), thickness=2)
+        cv2.circle(canvas, tuple(tl_rot.astype(int)), 2, (255, 180, 255), 2)
+        cv2.line(canvas, pt1=tuple(corrected_line_center.astype(int)), pt2=tuple(tl_rot.astype(int)), color=(180, 255, 255), thickness=2)
+        cv2.circle(canvas, tuple(bl_rot.astype(int)), 2, (255, 180, 255), 2)
+        cv2.line(canvas, pt1=tuple(tl_rot.astype(int)), pt2=tuple(bl_rot.astype(int)), color=(180, 255, 255), thickness=2)
+        cv2.circle(canvas, tuple(br_rot.astype(int)), 2, (255, 180, 255), 2)
+        cv2.line(canvas, pt1=tuple(bl_rot.astype(int)), pt2=tuple(br_rot.astype(int)), color=(180, 255, 255), thickness=2)
+        cv2.circle(canvas, tuple(tr_rot.astype(int)), 2, (255, 180, 255), 2)
+        cv2.line(canvas, pt1=tuple(br_rot.astype(int)), pt2=tuple(tr_rot.astype(int)), color=(180, 255, 255), thickness=2)
 
     if debug:
         print("TL 2: %s" % (tl_rot,))
@@ -139,7 +139,7 @@ def calculate_corners(center, player_row, board_shape, image_shape, canvas=None,
         print("BR 2: %s" % (br_rot,))
         print("TR 2: %s" % (tr_rot,))
 
-    return tl, tr, br, bl
+    return tl_rot, tr_rot, br_rot, bl_rot
 
 
 if __name__ == "__main__":

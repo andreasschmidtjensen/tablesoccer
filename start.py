@@ -1,36 +1,44 @@
-import os
-
 import cv2
-import imutils
-from imutils.video import WebcamVideoStream, FPS
-import numpy as np
 
-from tablesoccer import SoccerField
-from yolo.test import darknet
-from util.camera import get_image
-
+from tablesoccer import Controller
 
 def setup_window(name, x, y):
     cv2.namedWindow(name)
     cv2.moveWindow(name, x, y)
 
 
-setup_window("CNN", 0, 0)
+setup_window("Raw image", 0, 0)
 setup_window("Environment", 0, 500)
-setup_window("Statistics", 500, 0)
+setup_window("Transformed image", 500, 0)
+
+source_type = 'webcam'
+path = 0
+
+d = Controller(source_type, path)
+d.start()
+
+while True:
+    raw = d.snapshots.get("RAW_DETECTIONS")
+    calc = d.snapshots.get("CORNER_CALC")
+    transformed = d.snapshots.get("TRANSFORMED")
+    env = d.snapshots.get("ENVIRONMENT")
+
+    if raw is not None:
+        cv2.imshow('Raw image', raw)
+
+    if env is not None:
+        cv2.imshow('Environment', env)
+
+    if transformed is not None:
+        cv2.imshow('Transformed image', transformed)
+
+    cv2.waitKey(1)
+
+
+
 
 playing = True
 
-cwd = os.getcwd() + "/yolo"
-os.chdir(cwd)
-
-CONFIG = cwd + "/yolov3-tablesoccer.cfg"
-WEIGHTS = cwd + "/model/tablesoccer-v1.weights"
-DATA = cwd + "/tablesoccer.data"
-THRESH = 0.25
-
-source_type = 'video'
-path = '/Users/asj/Downloads/tracking-example.mp4'
 
 if source_type == 'webcam':
     source = WebcamVideoStream(int(path)).start()
@@ -42,22 +50,47 @@ else:
 fps = FPS().start()
 
 field = SoccerField()
+detector = Detector()
+
+i = 0
+
+DEBUG = True
+YOLO_SIZE = (416, 416)
 
 while True:
-    for i in range(10):
-        frame = get_image(source)
+    frame = get_image(source)
     frame = imutils.resize(frame, width=400)
 
-    result = darknet.performDetect(frame, thresh=THRESH, makeImageOnly=True, configPath=CONFIG, weightPath=WEIGHTS,
-                                   metaPath=DATA)
+    if detector.corners is None or i == 0:
+        detector.calculate_field(frame)
 
-    img = cv2.cvtColor(result["image"], cv2.COLOR_BGR2RGB)
-    cv2.imshow('CNN', img)
-    field.calc_field(result["detections"])
+    if DEBUG:
+        img = cv2.resize(frame.copy(), YOLO_SIZE)
+        if detector.corners is not None:
+            for c in detector.corners:
+                img = cv2.circle(img, (int(c[0]), int(c[1])), 2, (255, 255, 120), 2)
+        cv2.imshow('Raw image', img)
 
-    env = np.zeros((250, 400, 3), np.uint8)
+    if detector.corners is not None:
+        if DEBUG:
+            cv2.imshow('Calc image', detector.calc_image)
+
+        field.update(detector)
+
+        transformed = cv2.resize(frame, YOLO_SIZE)
+        transformed = four_point_transform(transformed, np.array(detector.corners))
+
+        detector.detect(transformed)
+        cv2.imshow('Transformed image', cv2.cvtColor(detector.raw_image, cv2.COLOR_BGR2RGB))
+
+    env = np.zeros((YOLO_SIZE[0], YOLO_SIZE[1], 3), np.uint8)
     env = field.draw(env)
-
     cv2.imshow('Environment', env)
 
     cv2.waitKey(1)
+
+    i += 1
+
+    if i % 100 == 0:
+        i = 0
+

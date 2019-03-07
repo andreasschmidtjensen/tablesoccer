@@ -1,35 +1,20 @@
-"""
-The SoccerField represents the field of the tablesoccer. It is the core of the environment and will always contain up
-to date information on:
-
-* center of the field
-* ball position
-* player position
-* player rotation
-
-The center of the field is used to calculate the size of the entire field. If we know the center and the size of its
-circle, we can calculate the location of the corners. All coordinates of other information are relative to the top-left
-corner of the field.
-"""
 import cv2
 
 from tablesoccer.Ball import Ball
+from tablesoccer.Players import Players
 
 ACTUAL_RADIUS = 2
-ACTUAL_WIDTH = 20
-ACTUAL_HEIGHT = 10
+ACTUAL_WIDTH = 33
+ACTUAL_HEIGHT = 23
 
 
 class SoccerField:
     def __init__(self):
         self.center = None
-
-        self.top_left = None
-        self.top_right = None
-        self.bottom_right = None
-        self.bottom_left = None
+        self.corners = None
 
         self.ball = Ball()
+        self.players = None
 
     def calc_field(self, detections):
         """
@@ -63,24 +48,37 @@ class SoccerField:
 
         if field_center is not None:
             # detection of center
-
-            print("Field center: %s" % (field_center,))
-
             field_x = field_center[2][0]
             field_y = field_center[2][1]
             field_w = field_center[2][2]
             field_h = field_center[2][3]
 
-            w = field_w / ACTUAL_RADIUS * ACTUAL_WIDTH
-            h = field_h / ACTUAL_RADIUS * ACTUAL_HEIGHT
-            self.top_left = (field_x - w / 2, field_y - h / 2)
-            self.top_right = (field_x + w / 2, field_y - h / 2)
-            self.bottom_right = (field_x + w / 2, field_y + h / 2)
-            self.bottom_left = (field_x - w / 2, field_y + h / 2)
+            self.ratio_width = field_w / ACTUAL_RADIUS
+            self.ratio_height = field_h / ACTUAL_RADIUS
+
+            self.board_width = field_w / ACTUAL_RADIUS * ACTUAL_WIDTH
+            self.board_height = field_h / ACTUAL_RADIUS * ACTUAL_HEIGHT
+
+            self.top_left = (field_x - self.board_width / 2, field_y - self.board_height / 2)
+            self.top_right = (field_x + self.board_width / 2, field_y - self.board_height / 2)
+            self.bottom_right = (field_x + self.board_width / 2, field_y + self.board_height / 2)
+            self.bottom_left = (field_x - self.board_width / 2, field_y + self.board_height / 2)
 
             self.center = (field_x, field_y)
 
+            if self.players is None:
+                self.players = Players(self.top_left[0], self.top_right[0], rows=4)
+
         self.ball.update(detections)
+        if self.players is not None:
+            self.players.update(detections)
+
+    def update(self, detector):
+        self.center = detector.center
+        self.corners = detector.corners
+
+        self.ball = detector.ball
+        self.players = detector.players
 
     def draw(self, canvas):
         """
@@ -95,23 +93,19 @@ class SoccerField:
         :param canvas:
         :return:
         """
-        canvas_width = canvas.shape[1]
-        canvas_height = canvas.shape[0]
-
         if self.center is not None:
-            center_x = (self.center[0] - self.top_left[0]) / (self.top_right[0] - self.top_left[0]) * canvas_width
-            center_y = (self.center[1] - self.top_left[1]) / (self.bottom_left[1] - self.top_left[1]) * canvas_height
+            canvas = cv2.circle(canvas, tuple(self.center.astype(int)), 2, (120, 255, 255), 2)
 
-            canvas = cv2.circle(canvas, (int(center_x), int(center_y)), 2, (120, 255, 255), 2)
-
-            ball_pos = self.ball.position
+            ball_pos = self.ball.get_position()
             if ball_pos is not None:
-                center_x = (ball_pos[0] - self.top_left[0]) / (self.top_right[0] - self.top_left[0]) * canvas_width
-                center_y = (ball_pos[1] - self.top_left[1]) / (self.bottom_left[1] - self.top_left[1]) * canvas_height
+                canvas = cv2.circle(canvas, tuple(ball_pos.astype(int)), 2, (255, 120, 255), 2)
 
-                canvas = cv2.circle(canvas, (int(center_x), int(center_y)), 2, (255, 120, 255), 2)
+            players = self.players
+            if players is not None:
+                for i, row in enumerate(players.players):
+                    for player in row:
+                        if len(player) > 0:
+                            x, y = player[0], player[1]
+                            canvas = cv2.circle(canvas, (int(x), int(y)), 2, (255, 255, 120), 2)
 
         return canvas
-
-
-
