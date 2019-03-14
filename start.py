@@ -1,6 +1,8 @@
 import cv2
+import imutils
 
 from tablesoccer import Controller
+
 
 def setup_window(name, x, y):
     cv2.namedWindow(name)
@@ -13,8 +15,9 @@ setup_window("Transformed image", 500, 0)
 
 source_type = 'webcam'
 path = 0
+imwrite = True
 
-d = Controller(source_type, path)
+d = Controller(source_type, path, debug=True)
 d.start()
 
 while True:
@@ -25,12 +28,15 @@ while True:
 
     if raw is not None:
         cv2.imshow('Raw image', raw)
+        if imwrite: cv2.imwrite('raw.jpg', raw)
 
     if env is not None:
         cv2.imshow('Environment', env)
+        if imwrite: cv2.imwrite('env.jpg', env)
 
     if transformed is not None:
-        cv2.imshow('Transformed image', transformed)
+        cv2.imshow('Transformed image', imutils.resize(transformed, width=250))
+        if imwrite: cv2.imwrite('transformed.jpg', transformed)
 
     cv2.waitKey(1)
 

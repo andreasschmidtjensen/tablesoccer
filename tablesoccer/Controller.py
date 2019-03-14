@@ -48,6 +48,7 @@ class Controller(Thread):
             frame = get_image(self.source)
             frame = imutils.resize(frame, width=400)
 
+            # 1) DETECT CORNERS
             if self.detector.corners is None or self.recalculate:
                 print("** Recalculating field **")
                 self.detector.calculate_field(frame)
@@ -60,6 +61,7 @@ class Controller(Thread):
                         img = cv2.circle(img, (int(c[0]), int(c[1])), 2, (255, 255, 120), 2)
                 self.snapshots["RAW_DETECTIONS"] = img
 
+            # 2) TRANSFROM IMAGE AND DO DETECTIONS
             if self.detector.corners is not None:
                 if self.debug:
                     self.snapshots["CORNER_CALC"] = self.detector.calc_image
