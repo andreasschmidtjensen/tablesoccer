@@ -1,31 +1,24 @@
 import atexit
+import json
 
-from flask import Flask, render_template_string, Response
+from flask import Flask, render_template, Response
 import cv2
 
 from tablesoccer import Controller
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/')
 def index():
-    return render_template_string("""<html>
-  <head>
-    <title>Stream Table Soccer</title>
-  </head>
-  <body>
-    <h1>TRANSFORMED</h1>
-    <img src="{{ url_for('video', feed='TRANSFORMED') }}">
-    <h1>ENVIRONMENT</h1>
-    <img src="{{ url_for('video', feed='ENVIRONMENT') }}">
-  </body>
-</html>""")
+    return render_template("base.html")
 
 
 def gen(image):
     while True:
-        frame = d.snapshots.get(image)
+        frame = controller.snapshots.get(image)
         if frame is not None:
             _, jpeg = cv2.imencode('.jpg', frame)
             yield (b'--frame\r\n'
@@ -40,19 +33,25 @@ def video(feed):
 
 @app.route('/recalculate')
 def recalculate():
-    d.schedule_recalculation()
+    controller.schedule_recalculation()
 
     return "ok"
+
+
+@app.route('/stats')
+@cross_origin()
+def stats():
+    return json.dumps(controller.get_stats())
 
 
 if __name__ == '__main__':
     source_type = 'webcam'
     path = 0
 
-    d = Controller(source_type, path, debug=True)
-    d.start()
+    controller = Controller(source_type, path, debug=True)
+    controller.start()
 
-    atexit.register(lambda: d.stop())
+    atexit.register(lambda: controller.stop())
 
     app.run(host='0.0.0.0')
 

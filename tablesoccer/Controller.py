@@ -80,3 +80,29 @@ class Controller(Thread):
 
     def schedule_recalculation(self):
         self.recalculate = True
+
+    def get_stats(self):
+        score = [0, 0]
+        goals = []
+        for goal in self.field.score:
+            score[goal["team"]] += 1
+            player = ""
+            if "row" in goal["player"]:
+                player = "(%s, %s)" % (goal["player"]["row"], goal["player"]["position"])
+            goals.append({
+                "time": goal["ts"].strftime("%X"),
+                "team": goal["team"],
+                "player": player
+            })
+
+        team_possession = [50, 50]
+        if self.field.possession is not None:
+            p = self.field.possession[0]
+            team_possession = ["%.0f" % (p[0] * 100), "%.0f" % (p[1] * 100)]
+
+        return {
+            "score": {"home": score[0], "away": score[1]},
+            "possession": {"home": team_possession[0], "away": team_possession[1]},
+            "goals": goals
+        }
+        pass

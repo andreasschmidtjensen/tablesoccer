@@ -110,6 +110,9 @@ class GoalChecker:
                     for r, row in enumerate(self.player_history[i]):
                         for p, player in enumerate(row.get_players()):
                             # calc distance between shooting position and player
+                            if pos is None or player[0:2] is None:
+                                continue
+
                             dist = np.linalg.norm(np.array(pos) - np.array(player[0:2]))
                             if dist < min_dist:
                                 min_dist = dist
