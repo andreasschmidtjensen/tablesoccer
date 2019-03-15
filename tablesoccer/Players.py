@@ -3,16 +3,23 @@ import numpy as np
 ROTATION_MIN = 0.5
 ROTATION_MAX = 2.0
 
+REACH_WIDTH = 100
+REACH_HEIGHT = 75
+
+TEAM_HOME = 0
+TEAM_AWAY = 1
+
 
 class Players:
-    def __init__(self, field_x_start, field_x_end, row_config=(3, 3, 3, 3)):
+    def __init__(self, field_x_start, field_x_end,
+                 row_config=((3, TEAM_HOME), (3, TEAM_AWAY), (3, TEAM_HOME), (3, TEAM_AWAY))):
         self.rows = len(row_config)
         self.field_x_start = field_x_start
         self.field_x_end = field_x_end
 
         self.row_size = (self.field_x_end - self.field_x_start) / self.rows
 
-        self.players = [Row(i, num_players) for i, num_players in enumerate(row_config)]
+        self.players = [Row(i, config[0], config[1]) for i, config in enumerate(row_config)]
 
     def update(self, detections):
         for r in self.players:
@@ -38,6 +45,23 @@ class Players:
         else:
             return None
 
+    def calculate_possession(self, ball_position):
+        if ball_position is None:
+            return None
+
+        team_possession = [0, 0]
+        player_possession = []
+        for row in self.players:
+            row.calculate_possession(ball_position)
+
+            team = row.team
+            possession = row.possession
+            team_possession[team] += np.sum(possession)
+            player_possession.append(possession)
+
+        return team_possession / np.sum(team_possession), \
+               player_possession / np.sum(player_possession)
+
 
 class Row:
     """
@@ -48,14 +72,17 @@ class Row:
     When re-detecting the field, we recreate the row, but since the position of the
     players can't change, we will get the same configuration again with updated positions.
     """
-    def __init__(self, row_number, num_players):
+    def __init__(self, row_number, num_players, team):
         self.row_number = row_number
         self.num_players = num_players
+        self.team = team
 
         self.players = []
         self.rotation = 0.0
 
         self.x_coordinate = None
+
+        self.possession = [0 for _ in range(num_players)]
 
     def reset(self):
         self.players = []
@@ -78,6 +105,20 @@ class Row:
         if len(self.players) == self.num_players:
             self.calculate_rotation()
             self.x_coordinate = np.mean([p[0] for p in self.players])
+
+    def calculate_possession(self, ball_position):
+        for i, player in enumerate(self.players):
+            reach_x_start = player[0] - REACH_WIDTH / 2
+            reach_x_end = player[0] + REACH_WIDTH / 2
+            reach_y_start = player[1] - REACH_HEIGHT / 2
+            reach_y_end = player[1] + REACH_HEIGHT / 2
+
+            ball_x = ball_position[0]
+            ball_y = ball_position[1]
+
+            if reach_x_start < ball_x < reach_x_end and reach_y_start < ball_y < reach_y_end:
+                self.possession[i] += 1
+                break
 
     def get_players(self):
         return self.players

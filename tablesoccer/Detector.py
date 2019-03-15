@@ -101,7 +101,7 @@ class Detector:
 
             if players is None:
                 # initialize players with the raw calculation of board location
-                players = Players(raw_top_left[0], raw_top_right[0], row_config=(3, 3, 3, 3))
+                players = Players(raw_top_left[0], raw_top_right[0])
 
             players.update(detection_map.get('player'))
 
@@ -138,6 +138,6 @@ class Detector:
         self.ball.update(detection_map.get('ball'))
 
         if self.players is None:
-            self.players = Players(0, self.raw_image.shape[1], row_config=(3, 3, 3, 3))
+            self.players = Players(0, self.raw_image.shape[1])
 
         self.players.update(detection_map.get('player'))
