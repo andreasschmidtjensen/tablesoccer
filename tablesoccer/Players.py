@@ -108,6 +108,9 @@ class Row:
 
     def calculate_possession(self, ball_position):
         for i, player in enumerate(self.players):
+            if len(self.possession) < i:
+                continue  # has detected too many players
+
             reach_x_start = player[0] - REACH_WIDTH / 2
             reach_x_end = player[0] + REACH_WIDTH / 2
             reach_y_start = player[1] - REACH_HEIGHT / 2

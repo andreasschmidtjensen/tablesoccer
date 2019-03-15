@@ -19,7 +19,7 @@ class Controller(Thread):
 
         self.fps = FPS().start()
 
-        self.field = SoccerField()
+        self.field = SoccerField(YOLO_SIZE, debug)
         self.detector = Detector()
 
         self.debug = debug
