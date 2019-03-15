@@ -77,6 +77,7 @@ class Detector:
         raw_image = detection_result["image"]
         detection_map = self.create_detection_map(detection_result["detections"])
 
+        center = None
         players = None
 
         if 'field_center' in detection_map:
@@ -100,15 +101,15 @@ class Detector:
 
             if players is None:
                 # initialize players with the raw calculation of board location
-                players = Players(raw_top_left[0], raw_top_right[0], rows=4)
+                players = Players(raw_top_left[0], raw_top_right[0], row_config=(3, 3, 3, 3))
 
             players.update(detection_map.get('player'))
 
-        if players is None or players.get_row(2) is None or len(players.get_row(2)) < 2:
+        if players is None or players.get_row(2) is None or len(players.get_row(2).get_players()) < 2:
             # detection was not successful
             return False
 
-        row = players.get_row(2)
+        row = players.get_row(2).get_players()
 
         # reset image
         self.calc_image = np.zeros((raw_image.shape[0], raw_image.shape[1], 3), np.uint8)
@@ -137,6 +138,6 @@ class Detector:
         self.ball.update(detection_map.get('ball'))
 
         if self.players is None:
-            self.players = Players(0, self.raw_image.shape[1], rows=4)
+            self.players = Players(0, self.raw_image.shape[1], row_config=(3, 3, 3, 3))
 
         self.players.update(detection_map.get('player'))

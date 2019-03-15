@@ -7,7 +7,7 @@ from tablesoccer.Position import Position
 
 class Ball:
     def __init__(self):
-        self.position = Position(10)
+        self.position = Position(5)
         self.history = []
         self.direction = ""
 

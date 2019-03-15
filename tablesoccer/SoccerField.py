@@ -1,4 +1,6 @@
 import cv2
+from PIL import ImageFont, ImageDraw, Image
+import numpy as np
 
 from tablesoccer.Ball import Ball
 
@@ -32,21 +34,32 @@ class SoccerField:
         :return:
         """
         if self.center is not None:
-            cv2.putText(canvas, "DIR: %s" % self.ball.direction, (0, 80),
-                        cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (120, 255, 50), 1)
+            font = ImageFont.truetype("Roboto-Regular.ttf", 12)
 
-            canvas = cv2.circle(canvas, tuple(self.center.astype(int)), 2, (120, 255, 255), 2)
+            im = Image.fromarray(canvas)
+            draw = ImageDraw.Draw(im)
+
+            draw.text((0, 0), "Direction: %s" % self.ball.direction, font=font)
+
+            center_bb = (self.center[0] - 2, self.center[1] - 2, self.center[0] + 2, self.center[1] + 2)
+            draw.ellipse(center_bb, (120, 255, 255, 255))
 
             ball_pos = self.ball.get_position()
             if ball_pos is not None:
-                canvas = cv2.circle(canvas, tuple(ball_pos.astype(int)), 2, (255, 120, 255), 2)
+                ball_bb = (ball_pos[0] - 2, ball_pos[1] - 2, ball_pos[0] + 2, ball_pos[1] + 2)
+                draw.ellipse(ball_bb, (255, 12, 255, 255))
 
             players = self.players
             if players is not None:
                 for i, row in enumerate(players.players):
-                    for player in row:
+                    draw.text((int(row.x_coordinate - 20), 25), "%.2f%%" % (row.rotation * 100), font=font)
+
+                    for player in row.get_players():
                         if len(player) > 0:
                             x, y = player[0], player[1]
-                            canvas = cv2.circle(canvas, (int(x), int(y)), 2, (255, 255, 120), 2)
+                            bb = (x - 2, y - 2, x + 2, y + 2)
+                            draw.ellipse(bb, (255, 255, 120, 255))
+
+            canvas = np.array(im)
 
         return canvas
