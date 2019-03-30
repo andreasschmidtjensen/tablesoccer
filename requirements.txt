@@ -5,3 +5,4 @@ scikit-learn
 imutils
 scikit-image
 flask
+pySerial

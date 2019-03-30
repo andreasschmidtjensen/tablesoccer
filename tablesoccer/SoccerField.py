@@ -3,6 +3,7 @@ import numpy as np
 
 from tablesoccer.Ball import Ball
 import tablesoccer.Players as Players
+from tablesoccer.Broadcaster import Broadcaster
 from tablesoccer.GoalChecker import GoalChecker
 
 
@@ -20,6 +21,8 @@ class SoccerField:
         self.possession = None
 
         self.debug = debug
+
+        self.goal_broadcast = Broadcaster()
 
     def update(self, detector):
         self.center = detector.center
@@ -114,5 +117,13 @@ class SoccerField:
 
         return np.array(im)
 
+    def get_score(self):
+        score = [0, 0]
+        for goal in self.score:
+            score[goal["team"]] += 1
+
+        return score[0], score[1]
+
     def goal_scored(self, result):
         self.score.append(result)
+        self.goal_broadcast.onChange.fire(result)

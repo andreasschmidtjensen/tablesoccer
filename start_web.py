@@ -48,7 +48,9 @@ if __name__ == '__main__':
     source_type = 'webcam'
     path = 0
 
-    controller = Controller(source_type, path, debug=True)
+    controller = Controller(source_type, path,
+                            arduino_config={"port": "COM3", "features": ["display", "sound"]},
+                            debug=True)
     controller.start()
 
     atexit.register(lambda: controller.stop())
