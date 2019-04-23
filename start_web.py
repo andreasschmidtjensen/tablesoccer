@@ -46,9 +46,10 @@ def stats():
 
 if __name__ == '__main__':
     source_type = 'webcam'
-    path = 0
+    path = 1
 
-    controller = Controller(source_type, path,
+    controller = Controller(source_type=source_type,
+                            paths={"camera_top": 1, "camera_home": 0},
                             arduino_config={"port": "COM3", "features": ["display", "sound"]},
                             debug=True)
     controller.start()

@@ -8,14 +8,14 @@ from tablesoccer.GoalChecker import GoalChecker
 
 
 class SoccerField:
-    def __init__(self, field_shape, debug=False):
+    def __init__(self, field_shape, paths, debug=False):
         self.center = None
         self.corners = None
         self.field_shape = field_shape
 
         self.ball = Ball()
         self.players = None
-        self.goal_checker = GoalChecker()
+        self.goal_checker = GoalChecker(paths)
 
         self.score = []
         self.possession = None
@@ -108,10 +108,11 @@ class SoccerField:
         for goal in self.score:
             score[goal["team"]] += 1
 
-            x = goal["player"]["shot_position"][0]
-            y = goal["player"]["shot_position"][1]
-            draw.line((x - 2, y - 2, x + 2, y + 2), fill=(255, 120, 120, 255), width=1)
-            draw.line((x + 2, y - 2, x - 2, y + 2), fill=(255, 120, 120, 255), width=1)
+            if "player" in goal:
+                x = goal["player"]["shot_position"][0]
+                y = goal["player"]["shot_position"][1]
+                draw.line((x - 2, y - 2, x + 2, y + 2), fill=(255, 120, 120, 255), width=1)
+                draw.line((x + 2, y - 2, x - 2, y + 2), fill=(255, 120, 120, 255), width=1)
 
         draw.text((0, self.field_shape[1]-15), "Home %s - %s Away" % tuple(score), font=font)
 

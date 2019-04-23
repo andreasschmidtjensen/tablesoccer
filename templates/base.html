@@ -39,9 +39,11 @@
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="env" role="tabpanel" aria-labelledby="env-tab">
                         <img src="{{ url_for('video', feed='ENVIRONMENT') }}" class="video" />
+                        <img src="{{ url_for('video', feed='CAM_HOME_DIFF') }}" class="video" />
                     </div>
                     <div class="tab-pane fade" id="cam" role="tabpanel" aria-labelledby="cam-tab">
                         <img src="{{ url_for('video', feed='TRANSFORMED') }}" class="video" />
+                        <img src="{{ url_for('video', feed='CAM_HOME') }}" class="video" />
                     </div>
                 </div>
             </div>

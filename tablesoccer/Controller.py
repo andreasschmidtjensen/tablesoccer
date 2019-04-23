@@ -15,12 +15,12 @@ YOLO_SIZE = (416, 416)
 
 
 class Controller(Thread):
-    def __init__(self, source_type, path, arduino_config={}, debug=False):
+    def __init__(self, source_type, paths, arduino_config={}, debug=False):
         super(Controller, self).__init__()
 
         self.fps = FPS().start()
 
-        self.field = SoccerField(YOLO_SIZE, debug)
+        self.field = SoccerField(YOLO_SIZE, paths, debug)
 
         self.detector = Detector()
 
@@ -33,6 +33,7 @@ class Controller(Thread):
 
         self.debug = debug
 
+        path = paths["camera_top"]
         if source_type == 'webcam':
             self.source = WebcamVideoStream(int(path)).start()
         elif source_type == 'video':
@@ -63,6 +64,8 @@ class Controller(Thread):
                 self.detector.calculate_field(frame)
                 self.recalculate = False
 
+                self.field.goal_checker.update_baselines()
+
             if self.debug:
                 img = cv2.resize(frame.copy(), YOLO_SIZE)
                 if self.detector.corners is not None:
@@ -86,8 +89,9 @@ class Controller(Thread):
             env = np.zeros((YOLO_SIZE[0], YOLO_SIZE[1], 3), np.uint8)
             env = self.field.draw(env)
             self.snapshots["ENVIRONMENT"] = env
+            self.field.goal_checker.update_snapshots(self.snapshots)
 
-            if self.arduino.has_feature("display"):
+            if self.arduino is not None and self.arduino.has_feature("display"):
                 self.arduino.print_score(*self.field.get_score())
 
     def schedule_recalculation(self):
@@ -99,7 +103,7 @@ class Controller(Thread):
         for goal in self.field.score:
             score[goal["team"]] += 1
             player = ""
-            if "row" in goal["player"]:
+            if "player" in goal and "row" in goal["player"]:
                 player = "(%s, %s)" % (goal["player"]["row"], goal["player"]["position"])
             goals.append({
                 "time": goal["ts"].strftime("%X"),
